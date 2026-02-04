@@ -51,9 +51,20 @@ def play_image_file_path(instance, filename):
 class Play(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    genres = models.ManyToManyField(Genre, blank=True, related_name='plays')
-    actors = models.ManyToManyField(Actor, blank=True, related_name='plays')
-    cover_image = models.ImageField(upload_to=play_image_file_path, blank=True)
+    genres = models.ManyToManyField(
+        Genre,
+        blank=True,
+        related_name='plays'
+    )
+    actors = models.ManyToManyField(
+        Actor,
+        blank=True,
+        related_name='plays'
+    )
+    cover_image = models.ImageField(
+        upload_to=play_image_file_path,
+        blank=True
+    )
 
     class Meta:
         ordering = ('title',)
@@ -78,7 +89,11 @@ class Performance(models.Model):
         ordering = ("-show_time",)
 
     def __str__(self):
-        return f"{self.play.title} in {self.theatre_hall.name} ({self.show_time:%Y-%m-%d %H:%M})"
+        return (
+            f"{self.play.title} in "
+            f"{self.theatre_hall.name} "
+            f"({self.show_time:%Y-%m-%d %H:%M})"
+        )
 
 
 class Reservation(models.Model):
@@ -121,16 +136,24 @@ class Ticket(models.Model):
         if not (1 <= value <= max_value):
             raise error_to_raise(
                 {
-                    attr_name: f"{attr_name.capitalize()} number must be in range (1, {max_value})."
+                    attr_name: f"{attr_name.capitalize()} "
+                               f"number must be in range "
+                               f"(1, {max_value})."
                 }
             )
 
     def clean(self):
         Ticket.validate_ticket(
-            self.row, self.performance.theatre_hall.rows, "row", ValidationError
+            self.row,
+            self.performance.theatre_hall.rows,
+            "row",
+            ValidationError
         )
         Ticket.validate_ticket(
-            self.seat, self.performance.theatre_hall.seats_in_row, "seat", ValidationError
+            self.seat,
+            self.performance.theatre_hall.seats_in_row,
+            "seat",
+            ValidationError
         )
 
     def save(self, *args, **kwargs):
